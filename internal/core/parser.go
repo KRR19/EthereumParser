@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 
+	"github.com/KRR19/EthereumParser/internal/infrastructure/ethereum"
 	"github.com/KRR19/EthereumParser/internal/models"
 )
 
@@ -20,16 +21,19 @@ type Parser interface {
 
 // ParserService implements the Parser interface
 type ParserService struct {
+	ethereum *ethereum.Client
 }
 
 // NewParserService creates a new instance of ParserService
-func NewParserService() *ParserService {
-	return &ParserService{}
+func NewParserService(ethereum *ethereum.Client) *ParserService {
+	return &ParserService{
+		ethereum: ethereum,
+	}
 }
 
 // GetCurrentBlock implements Parser.GetCurrentBlock
 func (p *ParserService) GetCurrentBlock(ctx context.Context) (int, error) {
-	return 1, nil
+	return 0, nil	
 }
 
 // Subscribe implements Parser.Subscribe

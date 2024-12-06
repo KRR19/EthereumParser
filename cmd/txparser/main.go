@@ -6,11 +6,12 @@ import (
 
 	"github.com/KRR19/EthereumParser/internal/core"
 	"github.com/KRR19/EthereumParser/internal/infrastructure/api"
+	"github.com/KRR19/EthereumParser/internal/infrastructure/ethereum"
 )
 
 func main() {
 	// Initialize components
-	parser := core.NewParserService()
+	parser := core.NewParserService(ethereum.NewClient())
 	handler := api.NewHandler(parser)
 
 	// Setup HTTP server

@@ -2,66 +2,23 @@ package ethereum
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-const (
-	ethereumRPCEndpoint = "https://ethereum-rpc.publicnode.com"
-)
-
 // Client represents an Ethereum JSON-RPC client
 type Client struct {
-	endpoint   string
 	httpClient *http.Client
 }
 
-// RPCRequest represents a JSON-RPC request
-type RPCRequest struct {
-	JsonRPC string        `json:"jsonrpc"`
-	Method  string        `json:"method"`
-	Params  []interface{} `json:"params"`
-	ID      int           `json:"id"`
-}
-
-// RPCResponse represents a JSON-RPC response
-type RPCResponse struct {
-	JsonRPC string      `json:"jsonrpc"`
-	Result  interface{} `json:"result"`
-	Error   *RPCError   `json:"error,omitempty"`
-	ID      int         `json:"id"`
-}
-
-// RPCError represents a JSON-RPC error
-type RPCError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-// Block represents an Ethereum block
-type Block struct {
-	Number       string   `json:"number"`
-	Hash         string   `json:"hash"`
-	Timestamp    string   `json:"timestamp"`
-	Transactions []string `json:"transactions"`
-}
-
-// NewClient creates a new Ethereum JSON-RPC client
-func NewClient() *Client {
-	return &Client{
-		endpoint:   ethereumRPCEndpoint,
-		httpClient: &http.Client{},
-	}
-}
-
 // Call makes a JSON-RPC call to the Ethereum node
-func (c *Client) Call(method string, params []interface{}) (*RPCResponse, error) {
+func (c *Client) Call(ctx context.Context, method string, params ...interface{}) (*RPCResponse, error) {
 	request := RPCRequest{
-		JsonRPC: "2.0",
+		JsonRPC: JsonRPC,
 		Method:  method,
 		Params:  params,
-		ID:      1,
 	}
 
 	body, err := json.Marshal(request)
@@ -69,7 +26,8 @@ func (c *Client) Call(method string, params []interface{}) (*RPCResponse, error)
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	resp, err := c.httpClient.Post(c.endpoint, "application/json", bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, "POST", ethereumRPCEndpoint, bytes.NewReader(body))
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make HTTP request: %w", err)
 	}
@@ -88,26 +46,23 @@ func (c *Client) Call(method string, params []interface{}) (*RPCResponse, error)
 }
 
 // GetLatestBlockNumber retrieves the latest block number
-func (c *Client) GetLatestBlockNumber() (uint64, error) {
-	response, err := c.Call("eth_blockNumber", nil)
+func (c *Client) GetLatestBlockNumber(ctx context.Context) (string, error) {
+	response, err := c.Call(ctx, "eth_blockNumber")
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	blockNumberHex, ok := response.Result.(string)
 	if !ok {
-		return 0, fmt.Errorf("invalid block number format")
+		return "", fmt.Errorf("invalid block number format")
 	}
 
-	var blockNumber uint64
-	fmt.Sscanf(blockNumberHex[2:], "%x", &blockNumber)
-	return blockNumber, nil
+	return blockNumberHex, nil
 }
 
 // GetBlockByNumber retrieves a block by its number
-func (c *Client) GetBlockByNumber(number uint64) (*Block, error) {
-	blockNumberHex := fmt.Sprintf("0x%x", number)
-	response, err := c.Call("eth_getBlockByNumber", []interface{}{blockNumberHex, true})
+func (c *Client) GetBlockByNumber(ctx context.Context, blockNumberHex string) (*Block, error) {
+	response, err := c.Call(ctx, "eth_getBlockByNumber", []interface{}{blockNumberHex, true})
 	if err != nil {
 		return nil, err
 	}
