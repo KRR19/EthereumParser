@@ -7,19 +7,16 @@ import (
 	"github.com/KRR19/EthereumParser/internal/core"
 )
 
-// Handler handles HTTP requests
 type Handler struct {
 	parser core.Parser
 }
 
-// NewHandler creates a new HTTP handler
 func NewHandler(parser core.Parser) *Handler {
 	return &Handler{
 		parser: parser,
 	}
 }
 
-// GetCurrentBlock handles the request to get the current block
 func (h *Handler) GetCurrentBlock(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -36,16 +33,13 @@ func (h *Handler) GetCurrentBlock(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]int{"currentBlock": block})
 }
 
-// Subscribe handles the request to subscribe to an address
 func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var req struct {
-		Address string `json:"address"`
-	}
+	var req SubscribeReq
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -58,7 +52,13 @@ func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	success := h.parser.Subscribe(req.Address)
+	ctx := r.Context()
+
+	success, err := h.parser.Subscribe(ctx, req.Address)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+
 	json.NewEncoder(w).Encode(map[string]bool{"success": success})
 }
 
@@ -76,7 +76,14 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	transactions := h.parser.GetTransactions(address)
+	ctx := r.Context()
+
+	transactions, err := h.parser.GetTransactions(ctx, address)
+	if err == core.ErrAddressNotSubscribed {
+		http.Error(w, err.Error(), http.StatusForbidden)
+	} else if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 	json.NewEncoder(w).Encode(transactions)
 }
 

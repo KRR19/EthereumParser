@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Initialize components
-	parser := core.NewParserService
+	parser := core.NewParserService()
 	handler := api.NewHandler(parser)
 
 	// Setup HTTP server
