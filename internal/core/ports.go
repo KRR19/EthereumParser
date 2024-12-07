@@ -3,10 +3,13 @@ package core
 import (
 	"context"
 	"time"
+
+	"github.com/KRR19/EthereumParser/internal/models"
 )
 
 type Ethereum interface {
 	GetLatestBlockNumber(context.Context) (string, error)
+	GetTransactionsByBlockNumber(ctx context.Context, blockNumberHex string) ([]models.Transaction, error)
 }
 
 type Logger interface {

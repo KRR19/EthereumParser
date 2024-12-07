@@ -6,14 +6,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/KRR19/EthereumParser/internal/models"
 )
 
-// Client represents an Ethereum JSON-RPC client
 type Client struct {
 	httpClient *http.Client
 }
 
-// Call makes a JSON-RPC call to the Ethereum node
 func (c *Client) Call(ctx context.Context, method string, params ...interface{}) (*RPCResponse, error) {
 	request := RPCRequest{
 		JsonRPC: JsonRPC,
@@ -26,7 +26,7 @@ func (c *Client) Call(ctx context.Context, method string, params ...interface{})
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", ethereumRPCEndpoint, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ethereumRPCEndpoint, bytes.NewReader(body))
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make HTTP request: %w", err)
@@ -45,7 +45,6 @@ func (c *Client) Call(ctx context.Context, method string, params ...interface{})
 	return &response, nil
 }
 
-// GetLatestBlockNumber retrieves the latest block number
 func (c *Client) GetLatestBlockNumber(ctx context.Context) (string, error) {
 	response, err := c.Call(ctx, "eth_blockNumber")
 	if err != nil {
@@ -60,9 +59,8 @@ func (c *Client) GetLatestBlockNumber(ctx context.Context) (string, error) {
 	return blockNumberHex, nil
 }
 
-// GetBlockByNumber retrieves a block by its number
-func (c *Client) GetBlockByNumber(ctx context.Context, blockNumberHex string) (*Block, error) {
-	response, err := c.Call(ctx, "eth_getBlockByNumber", []interface{}{blockNumberHex, true})
+func (c *Client) GetTransactionsByBlockNumber(ctx context.Context, blockNumberHex string) ([]models.Transaction, error) {
+	response, err := c.Call(ctx, "eth_getBlockByNumber", blockNumberHex, true)
 	if err != nil {
 		return nil, err
 	}
@@ -77,5 +75,5 @@ func (c *Client) GetBlockByNumber(ctx context.Context, blockNumberHex string) (*
 		return nil, fmt.Errorf("failed to unmarshal block: %w", err)
 	}
 
-	return &block, nil
+	return block.Transactions, nil
 }
