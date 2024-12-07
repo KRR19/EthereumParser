@@ -22,7 +22,7 @@ func main() {
 	crawler := core.NewCrawler(ethereumClient, logger, cfg, blockStore)
 	crawler.Start(context.Background())
 
-	parser := core.NewParserService(ethereumClient)
+	parser := core.NewParserService(blockStore)
 	handler := api.NewHandler(parser)
 
 	mux := handler.SetupRoutes()

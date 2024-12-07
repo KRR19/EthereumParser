@@ -8,10 +8,10 @@ import (
 )
 
 type Handler struct {
-	parser core.Parser
+	parser *core.ParserService
 }
 
-func NewHandler(parser core.Parser) *Handler {
+func NewHandler(parser *core.ParserService) *Handler {
 	return &Handler{
 		parser: parser,
 	}
@@ -62,7 +62,6 @@ func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]bool{"success": success})
 }
 
-// GetTransactions handles the request to get transactions for an address
 func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -87,13 +86,12 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(transactions)
 }
 
-// SetupRoutes sets up the HTTP routes
 func (h *Handler) SetupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/block", h.GetCurrentBlock)
-	mux.HandleFunc("/subscribe", h.Subscribe)
-	mux.HandleFunc("/transactions", h.GetTransactions)
+	mux.HandleFunc("/api/v1/block", h.GetCurrentBlock)
+	mux.HandleFunc("/api/v1/subscribe", h.Subscribe)
+	mux.HandleFunc("/api/v1/transactions", h.GetTransactions)
 
 	return mux
 }
