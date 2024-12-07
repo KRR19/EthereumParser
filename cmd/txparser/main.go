@@ -19,8 +19,9 @@ func main() {
 	cfg := config.NewConfig()
 	blockStore := store.NewBlockStore()
 	subscribeStore := store.NewSubscribeStore()
+	transactionStore := store.NewTransactionStore()
 
-	crawler := core.NewCrawler(ethereumClient, logger, cfg, blockStore)
+	crawler := core.NewCrawler(ethereumClient, logger, cfg, blockStore, subscribeStore, transactionStore)
 	crawler.Start(context.Background())
 
 	parser := core.NewParserService(blockStore, subscribeStore)

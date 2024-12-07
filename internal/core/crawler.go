@@ -2,38 +2,47 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/KRR19/EthereumParser/internal/models"
 )
 
 type Crawler struct {
-	eth        Ethereum
-	log        Logger
-	cfg        Config
-	blockStore BlockStore
+	eth              Ethereum
+	log              Logger
+	cfg              Config
+	blockStore       BlockStore
+	subscribeStore   SubscribeStore
+	transactionStore TransactionStore
 }
 
-func NewCrawler(eth Ethereum, log Logger, cfg Config, blockStore BlockStore) *Crawler {
+func NewCrawler(eth Ethereum, log Logger, cfg Config, blockStore BlockStore, subscribeStore SubscribeStore, transactionStore TransactionStore) *Crawler {
 	return &Crawler{
-		eth:        eth,
-		log:        log,
-		cfg:        cfg,
-		blockStore: blockStore,
+		eth:              eth,
+		log:              log,
+		cfg:              cfg,
+		blockStore:       blockStore,
+		subscribeStore:   subscribeStore,
+		transactionStore: transactionStore,
 	}
 }
 
 func (c *Crawler) Start(ctx context.Context) {
 	go func() {
-		blockNumberChn := make(chan string, 1)
+		cnt := c.cfg.CoreCount()
+
+		blockNumberChn := make(chan string, cnt)
 		go c.fetchBlockNumber(ctx, blockNumberChn)
 
-		newBlockSignal := make(chan string, 1)
+		newBlockSignal := make(chan string, cnt)
 		go c.handleBlockNumber(ctx, blockNumberChn, newBlockSignal)
 
-		transactionChn := make(chan models.Transaction, 1)
+		transactionChn := make(chan models.Transaction, cnt)
 		go c.getBlock(ctx, newBlockSignal, transactionChn)
+
+		for range cnt {
+			go c.handleTransaction(ctx, transactionChn)
+		}
 
 		<-ctx.Done()
 		c.log.Info("Context canceled in Start method")
@@ -102,11 +111,27 @@ func (c *Crawler) getBlock(ctx context.Context, newBlockSignal chan string, tran
 				continue
 			}
 
-			fmt.Printf("Fetched %d transactions for block %s\n", len(txs), bn)
-
 			for _, tx := range txs {
 				transactionChn <- tx
-				<-transactionChn
+			}
+		}
+	}
+}
+
+func (c *Crawler) handleTransaction(ctx context.Context, transactionChn chan models.Transaction) {
+	for {
+		select {
+		case <-ctx.Done():
+			c.log.Info("Context canceled in handleTransaction method")
+			return
+		case tx, ok := <-transactionChn:
+			if !ok {
+				c.log.Info("Transaction channel closed")
+				return
+			}
+
+			if c.subscribeStore.ValidateTransaction(tx) {
+				c.transactionStore.Save(tx)
 			}
 		}
 	}

@@ -19,6 +19,7 @@ type Logger interface {
 
 type Config interface {
 	BlockCheckInterval() time.Duration
+	CoreCount() int
 }
 
 type BlockStore interface {
@@ -27,5 +28,10 @@ type BlockStore interface {
 }
 
 type SubscribeStore interface {
-	Subscribe(address string)
+	Subscribe(string)
+	ValidateTransaction(models.Transaction) bool
+}
+
+type TransactionStore interface {
+	Save(models.Transaction)
 }
