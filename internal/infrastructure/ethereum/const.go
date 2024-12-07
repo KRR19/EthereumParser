@@ -2,5 +2,5 @@ package ethereum
 
 const (
 	ethereumRPCEndpoint = "https://ethereum-rpc.publicnode.com"
-	JsonRPC = "2.0"
+	JsonRPC             = "2.0"
 )
