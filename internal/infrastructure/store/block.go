@@ -4,21 +4,24 @@ import "sync"
 
 type BlockStore struct {
 	data string
-	mu   sync.Mutex
+	rwm  sync.RWMutex
 }
 
 func NewBlockStore() *BlockStore {
-	return &BlockStore{}
+	return &BlockStore{
+		data: "",
+		rwm:  sync.RWMutex{},
+	}
 }
 
 func (bs *BlockStore) GetLatestBlockNumber() string {
-	bs.mu.Lock()
-	defer bs.mu.Unlock()
+	bs.rwm.Lock()
+	defer bs.rwm.Unlock()
 	return bs.data
 }
 
 func (bs *BlockStore) SetBlockNumber(data string) {
-	bs.mu.Lock()
-	defer bs.mu.Unlock()
+	bs.rwm.Lock()
+	defer bs.rwm.Unlock()
 	bs.data = data
 }

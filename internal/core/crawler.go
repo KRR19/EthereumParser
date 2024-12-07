@@ -94,6 +94,7 @@ func (c *Crawler) handleBlockNumber(ctx context.Context, blockNumberChn chan str
 }
 
 func (c *Crawler) getBlock(ctx context.Context, newBlockSignal chan string, transactionChn chan models.Transaction) {
+	defer close(transactionChn)
 	for {
 		select {
 		case <-ctx.Done():

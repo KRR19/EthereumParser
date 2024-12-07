@@ -29,8 +29,12 @@ func (h *Handler) GetCurrentBlock(w http.ResponseWriter, r *http.Request) {
 	block, err := h.parser.GetCurrentBlock(ctx)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
-	json.NewEncoder(w).Encode(map[string]int{"currentBlock": block})
+
+	if err = json.NewEncoder(w).Encode(map[string]int{"currentBlock": block}); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +60,9 @@ func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 	success := h.parser.Subscribe(ctx, req.Address)
 
-	json.NewEncoder(w).Encode(map[string]bool{"success": success})
+	if err := json.NewEncoder(w).Encode(map[string]bool{"success": success}); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
@@ -77,11 +83,15 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	transactions, err := h.parser.GetTransactions(ctx, address)
 	if err == core.ErrAddressNotSubscribed {
 		http.Error(w, err.Error(), http.StatusForbidden)
+		return
 	} else if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	resp := GetTransactionsResp{Transactions: transactions}
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 func (h *Handler) SetupRoutes() *http.ServeMux {

@@ -33,6 +33,9 @@ func (c *Client) Call(ctx context.Context, method string, params ...interface{})
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ethereumRPCEndpoint, bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+	}
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make HTTP request: %w", err)
