@@ -1,24 +1,24 @@
 package models
 
 type Transaction struct {
-	Type                 string
-	ChainID              string
-	Nonce                string
-	Gas                  string
-	MaxFeePerGas         string
-	MaxPriorityFeePerGas string
-	To                   string
-	Value                string
-	AccessList           []string
-	Input                string
-	R                    string
-	S                    string
-	YParity              string
-	V                    string
-	Hash                 string
-	BlockHash            string
-	BlockNumber          string
-	TransactionIndex     string
-	From                 string
-	GasPrice             string
+	Type                 string   `json:"type"`
+	ChainID              string   `json:"chainId"`
+	Nonce                string   `json:"nonce"`
+	Gas                  string   `json:"gas"`
+	MaxFeePerGas         string   `json:"maxFeePerGas"`
+	MaxPriorityFeePerGas string   `json:"maxPriorityFeePerGas"`
+	To                   string   `json:"to"`
+	Value                string   `json:"value"`
+	AccessList           []string `json:"accessList"`
+	Input                string   `json:"input"`
+	R                    string   `json:"r"`
+	S                    string   `json:"s"`
+	YParity              string   `json:"yParity"`
+	V                    string   `json:"v"`
+	Hash                 string   `json:"hash"`
+	BlockHash            string   `json:"blockHash"`
+	BlockNumber          string   `json:"blockNumber"`
+	TransactionIndex     string   `json:"transactionIndex"`
+	From                 string   `json:"from"`
+	GasPrice             string   `json:"gasPrice"`
 }

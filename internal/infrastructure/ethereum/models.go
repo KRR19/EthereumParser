@@ -1,6 +1,10 @@
 package ethereum
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/KRR19/EthereumParser/internal/models"
+)
 
 // RPCRequest represents a JSON-RPC request
 type RPCRequest struct {
@@ -26,10 +30,10 @@ type RPCError struct {
 
 // Block represents an Ethereum block
 type Block struct {
-	Number       string        `json:"number"`
-	Hash         string        `json:"hash"`
-	Timestamp    string        `json:"timestamp"`
-	Transactions []Transaction `json:"transactions"`
+	Number       string               `json:"number"`
+	Hash         string               `json:"hash"`
+	Timestamp    string               `json:"timestamp"`
+	Transactions []models.Transaction `json:"transactions"`
 }
 
 // NewClient creates a new Ethereum JSON-RPC client
@@ -37,27 +41,4 @@ func NewClient() *Client {
 	return &Client{
 		httpClient: &http.Client{},
 	}
-}
-
-type Transaction struct {
-	Type                 string   `json:"type"`
-	ChainID              string   `json:"chainId"`
-	Nonce                string   `json:"nonce"`
-	Gas                  string   `json:"gas"`
-	MaxFeePerGas         string   `json:"maxFeePerGas"`
-	MaxPriorityFeePerGas string   `json:"maxPriorityFeePerGas"`
-	To                   string   `json:"to"`
-	Value                string   `json:"value"`
-	AccessList           []string `json:"accessList"`
-	Input                string   `json:"input"`
-	R                    string   `json:"r"`
-	S                    string   `json:"s"`
-	YParity              string   `json:"yParity"`
-	V                    string   `json:"v"`
-	Hash                 string   `json:"hash"`
-	BlockHash            string   `json:"blockHash"`
-	BlockNumber          string   `json:"blockNumber"`
-	TransactionIndex     string   `json:"transactionIndex"`
-	From                 string   `json:"from"`
-	GasPrice             string   `json:"gasPrice"`
 }
