@@ -28,5 +28,4 @@ type BlockStore interface {
 
 type SubscribeStore interface {
 	Subscribe(address string)
-	IsAddressSubscribed(address string) bool
 }
