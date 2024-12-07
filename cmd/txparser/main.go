@@ -17,37 +17,58 @@ import (
 	"github.com/KRR19/EthereumParser/internal/infrastructure/store"
 )
 
-func main() {
-	ethereumClient := ethereum.NewClient()
-	logger := logger.NewLogger()
-	cfg := config.NewConfig()
-	blockStore := store.NewBlockStore()
-	subscribeStore := store.NewSubscribeStore()
-	transactionStore := store.NewTransactionStore()
+type Dependencies struct {
+	EthereumClient    *ethereum.Client
+	Logger            *logger.Logger
+	Config            *config.Config
+	BlockStore        *store.BlockStore
+	SubscribeStore    *store.SubscribeStore
+	TransactionStore  *store.TransactionStore
+}
 
-	crawler := core.NewCrawler(ethereumClient, logger, cfg, blockStore, subscribeStore, transactionStore)
+func main() {
+	deps := initializeDependencies()
+	crawler := core.NewCrawler(deps.EthereumClient, deps.Logger, deps.Config, deps.BlockStore, deps.SubscribeStore, deps.TransactionStore)
 	ctx, cancel := context.WithCancel(context.Background())
 	crawler.Start(ctx)
 
-	parser := core.NewParserService(blockStore, subscribeStore)
+	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore)
 	handler := api.NewHandler(parser)
 
-	mux := handler.SetupRoutes()
+	server := startServer(handler)
 
+	waitForShutdown(server, crawler, cancel)
+}
+
+func initializeDependencies() *Dependencies {
+	return &Dependencies{
+		EthereumClient:   ethereum.NewClient(),
+		Logger:           logger.NewLogger(),
+		Config:           config.NewConfig(),
+		BlockStore:       store.NewBlockStore(),
+		SubscribeStore:   store.NewSubscribeStore(),
+		TransactionStore: store.NewTransactionStore(),
+	}
+}
+
+func startServer(handler *api.Handler) *http.Server {
+	mux := handler.SetupRoutes()
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: mux,
 	}
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
-
 	go func() {
 		log.Println("Starting server on :8080")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to start server: %v", err)
 		}
 	}()
+	return server
+}
 
+func waitForShutdown(server *http.Server, crawler *core.Crawler, cancel context.CancelFunc) {
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
 	log.Println("Shutting down server...")
 
@@ -58,7 +79,6 @@ func main() {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}
 
-	// Stop the crawler
 	crawler.Stop()
 	cancel()
 
