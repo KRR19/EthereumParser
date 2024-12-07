@@ -18,12 +18,12 @@ import (
 )
 
 type Dependencies struct {
-	EthereumClient    *ethereum.Client
-	Logger            *logger.Logger
-	Config            *config.Config
-	BlockStore        *store.BlockStore
-	SubscribeStore    *store.SubscribeStore
-	TransactionStore  *store.TransactionStore
+	EthereumClient   *ethereum.Client
+	Logger           *logger.Logger
+	Config           *config.Config
+	BlockStore       *store.BlockStore
+	SubscribeStore   *store.SubscribeStore
+	TransactionStore *store.TransactionStore
 }
 
 func main() {
