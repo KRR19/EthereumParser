@@ -22,3 +22,8 @@ type BlockStore interface {
 	GetLatestBlockNumber() string
 	SetBlockNumber(string)
 }
+
+type SubscribeStore interface {
+	Subscribe(address string)
+	IsAddressSubscribed(address string) bool
+}

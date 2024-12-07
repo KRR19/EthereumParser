@@ -54,10 +54,7 @@ func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
 
-	success, err := h.parser.Subscribe(ctx, req.Address)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	success := h.parser.Subscribe(ctx, req.Address)
 
 	json.NewEncoder(w).Encode(map[string]bool{"success": success})
 }

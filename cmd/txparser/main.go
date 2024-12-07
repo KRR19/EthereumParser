@@ -18,11 +18,12 @@ func main() {
 	logger := logger.NewLogger()
 	cfg := config.NewConfig()
 	blockStore := store.NewBlockStore()
+	subscribeStore := store.NewSubscribeStore()
 
 	crawler := core.NewCrawler(ethereumClient, logger, cfg, blockStore)
 	crawler.Start(context.Background())
 
-	parser := core.NewParserService(blockStore)
+	parser := core.NewParserService(blockStore, subscribeStore)
 	handler := api.NewHandler(parser)
 
 	mux := handler.SetupRoutes()

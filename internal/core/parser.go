@@ -9,12 +9,14 @@ import (
 )
 
 type ParserService struct {
-	blockStore BlockStore
+	blockStore     BlockStore
+	subscribeStore SubscribeStore
 }
 
-func NewParserService(blockStore BlockStore) *ParserService {
+func NewParserService(blockStore BlockStore, subscribeStore SubscribeStore) *ParserService {
 	return &ParserService{
-		blockStore: blockStore,
+		blockStore:     blockStore,
+		subscribeStore: subscribeStore,
 	}
 }
 
@@ -27,8 +29,9 @@ func (p *ParserService) GetCurrentBlock(ctx context.Context) (int, error) {
 	return n, nil
 }
 
-func (p *ParserService) Subscribe(ctx context.Context, address string) (bool, error) {
-	return true, nil
+func (p *ParserService) Subscribe(ctx context.Context, address string) bool {
+	p.subscribeStore.Subscribe(address)
+	return true
 }
 
 func (p *ParserService) GetTransactions(ctx context.Context, address string) ([]models.Transaction, error) {
