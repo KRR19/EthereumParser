@@ -1,14 +1,26 @@
 package config
 
-import "time"
+import (
+	"runtime"
+	"time"
+)
 
 type Config struct {
+	blockCheckInterval time.Duration
+	coreCount          int
 }
 
 func NewConfig() *Config {
-	return &Config{}
+	return &Config{
+		blockCheckInterval: 5 * time.Second,
+		coreCount:          runtime.NumCPU(),
+	}
 }
 
 func (c *Config) BlockCheckInterval() time.Duration {
-	return 5 * time.Second
+	return c.blockCheckInterval
+}
+
+func (c *Config) CoreCount() int {
+	return c.coreCount
 }
