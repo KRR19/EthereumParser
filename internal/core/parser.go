@@ -9,8 +9,8 @@ import (
 )
 
 type ParserService struct {
-	blockStore     BlockStore
-	subscribeStore SubscribeStore
+	blockStore       BlockStore
+	subscribeStore   SubscribeStore
 	transactionStore TransactionStore
 }
 
@@ -37,7 +37,7 @@ func (p *ParserService) Subscribe(ctx context.Context, address string) bool {
 
 func (p *ParserService) GetTransactions(ctx context.Context, address string) ([]models.Transaction, error) {
 	txs, ok := p.subscribeStore.GetSubscribedTransactions(address)
-	if ok {
+	if !ok {
 		return nil, ErrAddressNotSubscribed
 	}
 
