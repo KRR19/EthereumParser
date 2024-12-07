@@ -14,6 +14,12 @@ type Client struct {
 	httpClient *http.Client
 }
 
+func NewClient() *Client {
+	return &Client{
+		httpClient: &http.Client{},
+	}
+}
+
 func (c *Client) Call(ctx context.Context, method string, params ...interface{}) (*RPCResponse, error) {
 	request := RPCRequest{
 		JsonRPC: JsonRPC,

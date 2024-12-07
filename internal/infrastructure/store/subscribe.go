@@ -42,8 +42,10 @@ func (s *SubscribeStore) ValidateTransaction(transaction models.Transaction) boo
 	return wasAdded
 }
 
-func (s *SubscribeStore) GetSubscribedTransactions(address string) []string {
+func (s *SubscribeStore) GetSubscribedTransactions(address string) ([]string, bool) {
 	s.rwm.RLock()
 	defer s.rwm.RUnlock()
-	return s.data[address]
+	result, ok := s.data[address]
+
+	return result, ok
 }

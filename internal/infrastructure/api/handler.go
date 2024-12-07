@@ -80,7 +80,8 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	} else if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
-	json.NewEncoder(w).Encode(transactions)
+	resp := GetTransactionsResp{Transactions: transactions}
+	json.NewEncoder(w).Encode(resp)
 }
 
 func (h *Handler) SetupRoutes() *http.ServeMux {

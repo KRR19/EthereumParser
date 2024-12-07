@@ -30,8 +30,10 @@ type BlockStore interface {
 type SubscribeStore interface {
 	Subscribe(string)
 	ValidateTransaction(models.Transaction) bool
+	GetSubscribedTransactions(address string) ([]string, bool)
 }
 
 type TransactionStore interface {
 	Save(models.Transaction)
+	GetTransactions(hash ...string) []models.Transaction
 }
