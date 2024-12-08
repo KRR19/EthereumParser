@@ -21,7 +21,9 @@ func NewSubscribeStore() *SubscribeStore {
 func (s *SubscribeStore) Subscribe(address string) {
 	s.rwm.Lock()
 	defer s.rwm.Unlock()
-	s.data[address] = []string{}
+	if _, exists := s.data[address]; !exists {
+		s.data[address] = []string{}
+	}
 }
 
 func (s *SubscribeStore) ValidateTransaction(transaction models.Transaction) bool {
@@ -45,7 +47,6 @@ func (s *SubscribeStore) ValidateTransaction(transaction models.Transaction) boo
 func (s *SubscribeStore) GetSubscribedTransactions(address string) ([]string, bool) {
 	s.rwm.RLock()
 	defer s.rwm.RUnlock()
-	result, ok := s.data[address]
-
-	return result, ok
+	txs, exists := s.data[address]
+	return txs, exists
 }
