@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"syscall"
+	"os"
 	"testing"
 	"time"
 
@@ -102,8 +102,8 @@ func TestWaitForShutdown(t *testing.T) {
 	server := startServer(handler)
 
 	go func() {
-		time.Sleep(1 * time.Second)
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		process, _ := os.FindProcess(os.Getpid())
+		process.Signal(os.Interrupt)
 	}()
 
 	waitForShutdown(server, crawler, cancel)
@@ -119,7 +119,8 @@ func TestRun(t *testing.T) {
 	deps := initializeDependencies()
 	go func() {
 		time.Sleep(1 * time.Second)
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		process, _ := os.FindProcess(os.Getpid())
+		process.Signal(os.Interrupt)
 	}()
 	run(deps)
 }
