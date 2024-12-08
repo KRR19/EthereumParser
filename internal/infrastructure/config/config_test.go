@@ -1,10 +1,9 @@
-
 package config
 
 import (
+	"runtime"
 	"testing"
 	"time"
-	"runtime"
 )
 
 func TestNewConfig(t *testing.T) {
