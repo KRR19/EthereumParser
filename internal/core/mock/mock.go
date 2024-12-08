@@ -34,7 +34,7 @@ func (m *MockLogger) Error(msg string) {}
 type MockConfig struct{}
 
 func (m *MockConfig) BlockCheckInterval() time.Duration {
-	return 1 * time.Second
+	return time.Second
 }
 
 func (m *MockConfig) CoreCount() int {

@@ -21,7 +21,7 @@ func TestServerLifecycle(t *testing.T) {
 
 	server := startServer(handler)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(time.Second)
 
 	if server.Addr != Addr {
 		t.Errorf("Expected server address to be :8080, got %s", server.Addr)
@@ -83,7 +83,7 @@ func TestShutdownServer(t *testing.T) {
 	server := startServer(handler)
 
 	go func() {
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Second)
 		cancel()
 	}()
 
@@ -118,7 +118,7 @@ func TestWaitForShutdown(t *testing.T) {
 func TestRun(t *testing.T) {
 	deps := initializeDependencies()
 	go func() {
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Second)
 		process, _ := os.FindProcess(os.Getpid())
 		process.Signal(os.Interrupt)
 	}()

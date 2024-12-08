@@ -50,7 +50,7 @@ func TestGetBlock_Success(t *testing.T) {
 		if tx.Hash != "0x1" {
 			t.Fatalf("Expected transaction hash 0x1, got %s", tx.Hash)
 		}
-	case <-time.After(1 * time.Second):
+	case <-time.After(time.Second):
 		t.Fatal("Expected transaction, but got timeout")
 	}
 }
@@ -76,7 +76,7 @@ func TestGetBlock_Failure(t *testing.T) {
 	select {
 	case <-transactionChn:
 		t.Fatal("Expected no transaction, but got one")
-	case <-time.After(1 * time.Second):
+	case <-time.After(time.Second):
 	}
 }
 
@@ -99,7 +99,7 @@ func TestHandleTransaction_Success(t *testing.T) {
 
 	go crawler.handleTransaction(ctx, transactionChn)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(time.Second)
 	if len(transactionStore.Transactions) != 1 {
 		t.Fatal("Expected transaction to be saved")
 	}
@@ -123,12 +123,11 @@ func TestHandleTransaction_Failure(t *testing.T) {
 
 	go crawler.handleTransaction(ctx, transactionChn)
 
-	select {
-	case <-time.After(1 * time.Second):
-		if len(transactionStore.Transactions) != 0 {
-			t.Fatal("Expected no transaction to be saved")
-		}
+	time.Sleep(time.Second)
+	if len(transactionStore.Transactions) != 0 {
+		t.Fatal("Expected no transaction to be saved")
 	}
+
 }
 
 func TestHandleBlockNumber_Success(t *testing.T) {
@@ -154,7 +153,7 @@ func TestHandleBlockNumber_Success(t *testing.T) {
 		if bn != "0x10" {
 			t.Fatalf("Expected block number 0x10, got %s", bn)
 		}
-	case <-time.After(1 * time.Second):
+	case <-time.After(time.Second):
 		t.Fatal("Expected block number, but got timeout")
 	}
 }
@@ -181,6 +180,6 @@ func TestHandleBlockNumber_Failure(t *testing.T) {
 	select {
 	case <-newBlockSignal:
 		t.Fatal("Expected no block number, but got one")
-	case <-time.After(1 * time.Second):
+	case <-time.After(time.Second):
 	}
 }
