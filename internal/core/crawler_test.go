@@ -99,12 +99,11 @@ func TestHandleTransaction_Success(t *testing.T) {
 
 	go crawler.handleTransaction(ctx, transactionChn)
 
-	select {
-	case <-time.After(1 * time.Second):
-		if len(transactionStore.Transactions) != 1 {
-			t.Fatal("Expected transaction to be saved")
-		}
+	time.Sleep(1 * time.Second)
+	if len(transactionStore.Transactions) != 1 {
+		t.Fatal("Expected transaction to be saved")
 	}
+
 }
 
 func TestHandleTransaction_Failure(t *testing.T) {
