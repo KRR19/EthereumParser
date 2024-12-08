@@ -1,17 +1,22 @@
 package logger
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
-type Logger struct{}
+type Logger struct {
+	output io.Writer
+}
 
-func NewLogger() *Logger {
-	return &Logger{}
+func NewLogger(output io.Writer) *Logger {
+	return &Logger{output: output}
 }
 
 func (l *Logger) Info(msg string) {
-	fmt.Println(msg)
+	fmt.Fprintln(l.output, msg)
 }
 
 func (l *Logger) Error(msg string) {
-	fmt.Println(msg + Red)
+	fmt.Fprintln(l.output, Red+msg+Reset)
 }

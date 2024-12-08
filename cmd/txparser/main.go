@@ -16,7 +16,9 @@ import (
 	"github.com/KRR19/EthereumParser/internal/infrastructure/logger"
 	"github.com/KRR19/EthereumParser/internal/infrastructure/store"
 )
+
 const Addr = ":8080"
+
 type Dependencies struct {
 	EthereumClient   *ethereum.Client
 	Logger           *logger.Logger
@@ -43,7 +45,7 @@ func main() {
 func initializeDependencies() *Dependencies {
 	return &Dependencies{
 		EthereumClient:   ethereum.NewClient(ethereum.EthereumRPCEndpoint, http.DefaultClient),
-		Logger:           logger.NewLogger(),
+		Logger:           logger.NewLogger(os.Stdout),
 		Config:           config.NewConfig(),
 		BlockStore:       store.NewBlockStore(),
 		SubscribeStore:   store.NewSubscribeStore(),
