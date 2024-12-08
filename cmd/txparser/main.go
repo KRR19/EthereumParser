@@ -16,7 +16,7 @@ import (
 	"github.com/KRR19/EthereumParser/internal/infrastructure/logger"
 	"github.com/KRR19/EthereumParser/internal/infrastructure/store"
 )
-
+const Addr = ":8080"
 type Dependencies struct {
 	EthereumClient   *ethereum.Client
 	Logger           *logger.Logger
@@ -54,7 +54,7 @@ func initializeDependencies() *Dependencies {
 func startServer(handler *api.Handler) *http.Server {
 	mux := handler.SetupRoutes()
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    Addr,
 		Handler: mux,
 	}
 	go func() {
@@ -72,6 +72,12 @@ func waitForShutdown(server *http.Server, crawler *core.Crawler, cancel context.
 	<-stop
 	log.Println("Shutting down server...")
 
+	shutdownServer(server, crawler, cancel)
+
+	log.Println("Server exiting")
+}
+
+func shutdownServer(server *http.Server, crawler *core.Crawler, cancel context.CancelFunc) {
 	ctxShutDown, cancelShutDown := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelShutDown()
 
@@ -81,6 +87,4 @@ func waitForShutdown(server *http.Server, crawler *core.Crawler, cancel context.
 
 	crawler.Stop()
 	cancel()
-
-	log.Println("Server exiting")
 }

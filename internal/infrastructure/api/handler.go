@@ -8,10 +8,10 @@ import (
 )
 
 type Handler struct {
-	parser *core.ParserService
+	parser Parser
 }
 
-func NewHandler(parser *core.ParserService) *Handler {
+func NewHandler(parser Parser) *Handler {
 	return &Handler{
 		parser: parser,
 	}
