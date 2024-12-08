@@ -30,6 +30,10 @@ type Dependencies struct {
 
 func main() {
 	deps := initializeDependencies()
+	run(deps)
+}
+
+func run(deps *Dependencies) {
 	crawler := core.NewCrawler(deps.EthereumClient, deps.Logger, deps.Config, deps.BlockStore, deps.SubscribeStore, deps.TransactionStore)
 	ctx, cancel := context.WithCancel(context.Background())
 	crawler.Start(ctx)
