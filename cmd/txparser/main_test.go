@@ -108,10 +108,8 @@ func TestWaitForShutdown(t *testing.T) {
 
 	waitForShutdown(server, crawler, cancel)
 
-	// Verify that the server and crawler are properly shut down
 	select {
 	case <-ctx.Done():
-		// Context should be canceled
 	default:
 		t.Error("Expected context to be canceled")
 	}
