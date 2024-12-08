@@ -42,7 +42,7 @@ func main() {
 
 func initializeDependencies() *Dependencies {
 	return &Dependencies{
-		EthereumClient:   ethereum.NewClient(),
+		EthereumClient:   ethereum.NewClient(ethereum.EthereumRPCEndpoint, http.DefaultClient),
 		Logger:           logger.NewLogger(),
 		Config:           config.NewConfig(),
 		BlockStore:       store.NewBlockStore(),

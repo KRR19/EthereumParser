@@ -11,12 +11,14 @@ import (
 )
 
 type Client struct {
-	httpClient *http.Client
+	endpoint   string
+	httpClient HttpDoer
 }
 
-func NewClient() *Client {
+func NewClient(endpoint string, httpClient HttpDoer) *Client {
 	return &Client{
-		httpClient: &http.Client{},
+		endpoint:   endpoint,
+		httpClient: httpClient,
 	}
 }
 
@@ -32,7 +34,7 @@ func (c *Client) Call(ctx context.Context, method string, params ...interface{})
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ethereumRPCEndpoint, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint, bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
