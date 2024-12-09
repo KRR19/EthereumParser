@@ -100,10 +100,11 @@ func TestHandleTransaction_Success(t *testing.T) {
 	go crawler.handleTransaction(ctx, transactionChn)
 
 	time.Sleep(time.Second)
+	transactionStore.Mutex.Lock()
+	defer transactionStore.Mutex.Unlock()
 	if len(transactionStore.Transactions) != 1 {
 		t.Fatal("Expected transaction to be saved")
 	}
-
 }
 
 func TestHandleTransaction_Failure(t *testing.T) {

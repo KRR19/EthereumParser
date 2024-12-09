@@ -14,7 +14,7 @@ build:
 # Run the tests
 .PHONY: test
 test:
-	$(GOTEST) -v ./...
+	$(GOTEST) -v -race ./...
 
 # Clean the build files
 .PHONY: clean

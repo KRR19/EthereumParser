@@ -3,6 +3,7 @@ package mock
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/KRR19/EthereumParser/internal/models"
@@ -72,13 +73,18 @@ func (m *MockSubscribeStore) GetSubscribedTransactions(address string) ([]string
 
 type MockTransactionStore struct {
 	Transactions map[string]models.Transaction
+	Mutex        sync.Mutex
 }
 
 func (m *MockTransactionStore) Save(tx models.Transaction) {
+	m.Mutex.Lock()
+	defer m.Mutex.Unlock()
 	m.Transactions[tx.Hash] = tx
 }
 
 func (m *MockTransactionStore) GetTransactions(hash ...string) []models.Transaction {
+	m.Mutex.Lock()
+	defer m.Mutex.Unlock()
 	transactionsList := []models.Transaction{}
 	for _, h := range hash {
 		transactionsList = append(transactionsList, m.Transactions[h])
