@@ -14,10 +14,11 @@ type ParserService struct {
 	transactionStore TransactionStore
 }
 
-func NewParserService(blockStore BlockStore, subscribeStore SubscribeStore) *ParserService {
+func NewParserService(blockStore BlockStore, subscribeStore SubscribeStore, transactionStore TransactionStore) *ParserService {
 	return &ParserService{
-		blockStore:     blockStore,
-		subscribeStore: subscribeStore,
+		blockStore:       blockStore,
+		subscribeStore:   subscribeStore,
+		transactionStore: transactionStore,
 	}
 }
 

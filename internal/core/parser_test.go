@@ -11,7 +11,8 @@ import (
 func TestGetCurrentBlock(t *testing.T) {
 	blockStore := &mock.MockBlockStore{BlockNumber: "0x10"}
 	subscribeStore := &mock.MockSubscribeStore{}
-	parser := NewParserService(blockStore, subscribeStore)
+	TransactionStore := &mock.MockTransactionStore{}
+	parser := NewParserService(blockStore, subscribeStore, TransactionStore)
 
 	block, err := parser.GetCurrentBlock(context.Background())
 	if err != nil {
@@ -26,7 +27,8 @@ func TestGetCurrentBlock(t *testing.T) {
 func TestSubscribe(t *testing.T) {
 	subscribeStore := &mock.MockSubscribeStore{Data: map[string][]string{}}
 	blockStore := &mock.MockBlockStore{}
-	parser := NewParserService(blockStore, subscribeStore)
+	TransactionStore := &mock.MockTransactionStore{}
+	parser := NewParserService(blockStore, subscribeStore, TransactionStore)
 
 	address := "0x123"
 	subscribed := parser.Subscribe(context.Background(), address)
@@ -53,7 +55,7 @@ func TestGetTransactions(t *testing.T) {
 		},
 	}
 	blockStore := &mock.MockBlockStore{}
-	parser := NewParserService(blockStore, subscribeStore)
+	parser := NewParserService(blockStore, subscribeStore, transactionStore)
 	parser.transactionStore = transactionStore
 
 	t.Run("address subscribed", func(t *testing.T) {

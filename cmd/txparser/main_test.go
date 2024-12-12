@@ -16,7 +16,7 @@ func TestServerLifecycle(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	crawler.Start(ctx)
 
-	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore)
+	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore, deps.TransactionStore)
 	handler := api.NewHandler(parser)
 
 	server := startServer(handler)
@@ -59,7 +59,7 @@ func TestStartServer(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	crawler.Start(ctx)
 
-	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore)
+	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore, deps.TransactionStore)
 	handler := api.NewHandler(parser)
 
 	server := startServer(handler)
@@ -77,7 +77,7 @@ func TestShutdownServer(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	crawler.Start(ctx)
 
-	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore)
+	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore, deps.TransactionStore)
 	handler := api.NewHandler(parser)
 
 	server := startServer(handler)
@@ -96,7 +96,7 @@ func TestWaitForShutdown(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	crawler.Start(ctx)
 
-	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore)
+	parser := core.NewParserService(deps.BlockStore, deps.SubscribeStore, deps.TransactionStore)
 	handler := api.NewHandler(parser)
 
 	server := startServer(handler)
